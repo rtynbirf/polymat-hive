@@ -44,15 +44,31 @@ jobs:
             echo "🩺 Этаж 1 (Copilot): секрет есть, но аутентификация не прошла — проверь подписку Copilot."
           fi
 
-      - name: "Этаж 2 · проверка локального GGUF"
+      - name: "Этаж 2 · стенд нейромозга (сырой вывод)"
+        env:
+          TITLE: "🧪 Тест-драйв: проверка нейромозга"
+          BODY: "Хочу, чтобы улей умел переводить выпуски на английский и отвечал на двух языках."
         run: |
           pip install -q llama-cpp-python
           python3 - <<'PY'
+          import json, os, pathlib, re
+          title = os.environ.get("TITLE", "")
+          body = os.environ.get("BODY", "")[:800]
+          llm = Llama = None
           from llama_cpp import Llama
-          import os
-          llm = Llama(os.path.expanduser("~/brain/brain.gguf"), n_ctx=256, verbose=False)
+          llm = Llama(os.path.expanduser("~/brain/brain.gguf"), n_ctx=1024, verbose=False)
           out = llm.create_chat_completion(
-              messages=[{"role": "user", "content": "Скажи ровно: УЛЕЙ ЖИВ"}],
-              max_tokens=20)
-          print("🩺 Этаж 2 (локальный GGUF):", out["choices"][0]["message"]["content"].strip())
+              messages=[
+                  {"role": "system", "content": "Ты триаж-агент репозитория. Отвечай ТОЛЬКО JSON вида {\"labels\":[\"...\"],\"summary\":\"...\",\"plan\":[\"...\",\"...\",\"...\"]}. Метки только из списка: bug, enhancement, question, documentation, good first issue. Кратко, по-русски, дружелюбно."},
+                  {"role": "user", "content": "Заголовок выпуска: " + title + "\n\nТело выпуска:\n" + body},
+              ],
+              max_tokens=220, temperature=0.2)
+          text = out["choices"][0]["message"]["content"]
+          print("=== RAW MODEL OUTPUT (начало) ===")
+          print(text[:800])
+          print("=== RAW MODEL OUTPUT (конец) ===")
+          m = re.search(r"\{[\s\S]*\}", text)
+          print("JSON найден:", bool(m))
+          if m:
+              print("Экстракт:", m.group(0)[:400])
           PY
