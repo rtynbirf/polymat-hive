@@ -3,12 +3,12 @@
 # 🐝 ПОЛИМАТ-УЛЕЙ
 
 **Живой репозиторий-организм. Здесь работает экипаж автономных AI-агентов —
-официально, без единого внешнего сервера.**
+без единого внешнего сервера, с трёхэтажным мозгом.**
 
 [![Триаж-агент](https://github.com/rtynbirf/polymat-hive/actions/workflows/triage-agent.yml/badge.svg)](https://github.com/rtynbirf/polymat-hive/actions/workflows/triage-agent.yml)
 [![Дайджест-агент](https://github.com/rtynbirf/polymat-hive/actions/workflows/digest-agent.yml/badge.svg)](https://github.com/rtynbirf/polymat-hive/actions/workflows/digest-agent.yml)
 [![Доктор улея](https://github.com/rtynbirf/polymat-hive/actions/workflows/doctor-agent.yml/badge.svg)](https://github.com/rtynbirf/polymat-hive/actions/workflows/doctor-agent.yml)
-[![AI: Copilot CLI](https://img.shields.io/badge/AI-Copilot%20CLI-24292f?logo=github)](https://github.com/actions/ai-inference)
+[![Мозг: 3 этажа](https://img.shields.io/badge/мозг-Copilot·GGUF·инстинкты-24292f?logo=github)](agents/CREW.md)
 [![License: MIT](https://img.shields.io/badge/лицензия-MIT-0E8A16)](LICENSE)
 [![Пульс](https://img.shields.io/badge/пульс-живой-D9A441)](DIGEST.md)
 
@@ -29,7 +29,7 @@ flowchart LR
     B -- "метки + план" --> A
     C[⏰ Ежедневный cron] --> D["📰 Дайджест-агент"]
     D --> E[DIGEST.md обновлён]
-    B --> F[(Copilot CLI — внутри GitHub)]
+    B --> F[(Мозг: Copilot · GGUF · инстинкты)]
     D --> F
 ```
 
@@ -37,24 +37,34 @@ flowchart LR
 
 | Агент | Триггер | Суперсила |
 |---|---|---|
-| 🧠 Триаж-агент | `issues: opened` | Читает выпуск, ставит метку, пишет резюме и план из трёх шагов за ~30 секунд |
+| 🧠 Триаж-агент | `issues: opened` | Читает выпуск, ставит метку, пишет резюме и план из трёх шагов за ~1 минуту |
 | 📰 Дайджест-агент | cron `05:30 UTC` + кнопка | Сводит сутки истории репозитория в `DIGEST.md` и отмечает «настроение экипажа» |
-| 🩺 Доктор улея | еженедельно + кнопка | Проверяет живость связи с Copilot CLI и сообщает диагноз |
+| 🩺 Доктор улея | еженедельно + кнопка | Проверяет все три этажа мозга и сообщает диагноз |
 | 🚚 в резерве | — | Переводчик, хранитель README, ночной ревизор — см. дорожную карту |
 
-## 🎮 Проверь вживую (30 секунд)
+## 🧠 Три этажа мозга (суверенность в кубе)
+
+1. **Copilot CLI** — если секрет `COPILOT_PAT` задан и Copilot включён.
+2. **Локальный нейромозг GGUF** — модель `Qwen2.5-0.5B-Instruct` (Q4_K_M)
+   скачивается на раннер Actions и думает прямо там: **ни одного ключа,
+   ни одного внешнего сервиса**. Кэшируется между запусками.
+3. **Инстинкты** — эвристики без модели. Улей молчать не умеет.
+
+## 🎮 Проверь вживую (60 секунд)
 
 1. Открой **новый Issue** — любой, хоть «Привет, улей!».
 2. Триаж-агент ответит: метка + резюме + план действий.
-3. Загляни во вкладку **Actions** — увидишь агента за работой.
+3. Загляни во вкладку **Actions** — увидишь, каким этажом мозга думал агент.
 
 ## 🧠 Почему так ещё почти ни у кого нет
 
 - Официальный экшен **`actions/ai-inference@v3`** (июль 2026) прогоняет LLM
   через Copilot CLI прямо в GitHub Actions — но почти никто не собрал из него
   **экипаж**, а не одиночный воркфлоу.
-- **Ни серверов, ни внешних ключей**: весь организм живёт внутри GitHub —
-  Actions, Copilot CLI и один токен в зашифрованных Secrets.
+- **Локальный GGUF-нейромозг на раннере** — нейросеть работает внутри
+  бесплатного воркфлоу, без API-ключей и подписок. Полная офлайн-суверенность.
+- **Деградация graceful**: мозг выключен — экипаж переходит на этаж ниже
+  и всё равно отвечает. Организм не умирает.
 - Каждый агент — **один YAML-файл**. Скопируй в свой репозиторий — и у тебя такой же улей.
 
 ## 📦 Забрать улей себе
@@ -64,8 +74,8 @@ git clone https://github.com/rtynbirf/polymat-hive.git
 cp -r polymat-hive/.github/workflows твой-репо/.github/workflows/
 ```
 
-Понадобится секрет `COPILOT_PAT` (токен с доступом к Copilot) — карточки
-агентов и инструкция в [agents/CREW.md](agents/CREW.md).
+Секрет `COPILOT_PAT` — опционален: без него улей живёт на локальном мозге.
+Карточки агентов и инструкция — в [agents/CREW.md](agents/CREW.md).
 
 ## 🗺 Дорожная карта экипажа
 
