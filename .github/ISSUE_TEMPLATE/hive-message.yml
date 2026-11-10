@@ -1,0 +1,26 @@
+name: "🐝 Сообщение экипажу"
+description: "Открыть выпуск для триаж-агента — он ответит за ~30 секунд"
+labels: ["🤖 экипаж"]
+body:
+  - type: markdown
+    attributes:
+      value: "Экипаж улея слушает. Опиши мысль — 🧠 Триаж-агент разберёт и выдаст план."
+  - type: textarea
+    id: message
+    attributes:
+      label: "Что у тебя на уме?"
+      description: "Идея, вопрос, баг — что угодно."
+      placeholder: "Хочу, чтобы улей умел…"
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: "Тип сообщения"
+      options:
+        - "Идея"
+        - "Вопрос"
+        - "Баг"
+        - "Просто привет"
+    validations:
+      required: true
