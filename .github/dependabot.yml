@@ -1,0 +1,12 @@
+# П-19/T20 канон роя: еженедельно, группы, лимиты; экосистемы по телу репо.
+# polymat-hive: тело — воркфлоу агентов (digest/doctor/triage), манифестов пакетов нет.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns: ["*"]
+    open-pull-requests-limit: 5
