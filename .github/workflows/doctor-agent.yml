@@ -1,0 +1,34 @@
+name: "🩺 Доктор улея"
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+  models: read
+
+concurrency:
+  group: doctor
+  cancel-in-progress: false
+
+jobs:
+  doctor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Диагностика связи с GitHub Models"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "== 1. каталог моделей (GET) =="
+          code=$(curl -sS -o /tmp/cat.json -w '%{http_code}' https://models.github.ai/catalog/models -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" || true)
+          echo "HTTP $code | тело: $(head -c 300 /tmp/cat.json)"
+          echo
+          for m in openai/gpt-4.1-mini openai/gpt-4o-mini mistral-ai/ministral-3b meta/Llama-3.3-70B-Instruct; do
+            echo "== 2. модель: $m =="
+            jq -n --arg m "$m" '{model:$m, messages:[{role:"user", content:"Скажи ровно: УЛЕЙ ЖИВ"}], max_tokens:30}' > /tmp/req.json
+            code=$(curl -sS -o /tmp/resp.json -w '%{http_code}' https://models.github.ai/inference/chat/completions -H "Authorization: Bearer $GH_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d @/tmp/req.json || true)
+            echo "HTTP $code | тело: $(head -c 300 /tmp/resp.json)"
+            echo
+          done
