@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: read
-  models: read
 
 concurrency:
   group: doctor
@@ -17,18 +16,27 @@ jobs:
   doctor:
     runs-on: ubuntu-latest
     steps:
-      - name: "Диагностика связи с GitHub Models"
+      - name: "Установить Copilot CLI"
+        run: npm install -g @github/copilot
+
+      - name: "Контрольный вызов модели"
+        id: probe
+        continue-on-error: true
+        uses: actions/ai-inference@v3
         env:
-          GH_TOKEN: ${{ github.token }}
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_PAT }}
+        with:
+          model: gpt-4.1
+          max-tokens: "50"
+          system-prompt: "Отвечай ровно то, что попросили, без пояснений."
+          prompt: "Скажи ровно: УЛЕЙ ЖИВ"
+
+      - name: "Поставить диагноз"
         run: |
-          echo "== 1. каталог моделей (GET) =="
-          code=$(curl -sS -o /tmp/cat.json -w '%{http_code}' https://models.github.ai/catalog/models -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" || true)
-          echo "HTTP $code | тело: $(head -c 300 /tmp/cat.json)"
-          echo
-          for m in openai/gpt-4.1-mini openai/gpt-4o-mini mistral-ai/ministral-3b meta/Llama-3.3-70B-Instruct; do
-            echo "== 2. модель: $m =="
-            jq -n --arg m "$m" '{model:$m, messages:[{role:"user", content:"Скажи ровно: УЛЕЙ ЖИВ"}], max_tokens:30}' > /tmp/req.json
-            code=$(curl -sS -o /tmp/resp.json -w '%{http_code}' https://models.github.ai/inference/chat/completions -H "Authorization: Bearer $GH_TOKEN" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" -d @/tmp/req.json || true)
-            echo "HTTP $code | тело: $(head -c 300 /tmp/resp.json)"
-            echo
-          done
+          resp="${{ steps.probe.outputs.response }}"
+          if echo "$resp" | rg -q "УЛЕЙ ЖИВ"; then
+            echo "🩺 Диагноз: организм здоров — Copilot CLI отвечает."
+          else
+            echo "🩺 Диагноз: связь с моделью хромает. Ответ модели: '$resp'"
+            echo "Проверь секрет COPILOT_PAT и подписку Copilot."
+          fi
