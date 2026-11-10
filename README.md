@@ -3,11 +3,12 @@
 # 🐝 ПОЛИМАТ-УЛЕЙ
 
 **Живой репозиторий-организм. Здесь работает экипаж автономных AI-агентов —
-бесплатно, официально, без единого внешнего сервера.**
+официально, без единого внешнего сервера.**
 
 [![Триаж-агент](https://github.com/rtynbirf/polymat-hive/actions/workflows/triage-agent.yml/badge.svg)](https://github.com/rtynbirf/polymat-hive/actions/workflows/triage-agent.yml)
 [![Дайджест-агент](https://github.com/rtynbirf/polymat-hive/actions/workflows/digest-agent.yml/badge.svg)](https://github.com/rtynbirf/polymat-hive/actions/workflows/digest-agent.yml)
-[![AI: GitHub Models](https://img.shields.io/badge/AI-GitHub%20Models-24292f?logo=github)](https://github.com/features/models)
+[![Доктор улея](https://github.com/rtynbirf/polymat-hive/actions/workflows/doctor-agent.yml/badge.svg)](https://github.com/rtynbirf/polymat-hive/actions/workflows/doctor-agent.yml)
+[![AI: Copilot CLI](https://img.shields.io/badge/AI-Copilot%20CLI-24292f?logo=github)](https://github.com/actions/ai-inference)
 [![License: MIT](https://img.shields.io/badge/лицензия-MIT-0E8A16)](LICENSE)
 [![Пульс](https://img.shields.io/badge/пульс-живой-D9A441)](DIGEST.md)
 
@@ -28,7 +29,7 @@ flowchart LR
     B -- "метки + план" --> A
     C[⏰ Ежедневный cron] --> D["📰 Дайджест-агент"]
     D --> E[DIGEST.md обновлён]
-    B --> F[(GitHub Models — бесплатно)]
+    B --> F[(Copilot CLI — внутри GitHub)]
     D --> F
 ```
 
@@ -38,6 +39,7 @@ flowchart LR
 |---|---|---|
 | 🧠 Триаж-агент | `issues: opened` | Читает выпуск, ставит метку, пишет резюме и план из трёх шагов за ~30 секунд |
 | 📰 Дайджест-агент | cron `05:30 UTC` + кнопка | Сводит сутки истории репозитория в `DIGEST.md` и отмечает «настроение экипажа» |
+| 🩺 Доктор улея | еженедельно + кнопка | Проверяет живость связи с Copilot CLI и сообщает диагноз |
 | 🚚 в резерве | — | Переводчик, хранитель README, ночной ревизор — см. дорожную карту |
 
 ## 🎮 Проверь вживую (30 секунд)
@@ -48,11 +50,11 @@ flowchart LR
 
 ## 🧠 Почему так ещё почти ни у кого нет
 
-- Официальная связка **GitHub Models + Actions** (`actions/ai-inference@v1`,
-  право `models: read`) вышла в августе 2025 — но почти никто не собрал из неё
+- Официальный экшен **`actions/ai-inference@v3`** (июль 2026) прогоняет LLM
+  через Copilot CLI прямо в GitHub Actions — но почти никто не собрал из него
   **экипаж**, а не одиночный воркфлоу.
-- **0 ₽ / 0 $**: публичный репозиторий + GitHub Models = бесплатный тариф.
-  Ни ключей, ни серверов, ни подписок.
+- **Ни серверов, ни внешних ключей**: весь организм живёт внутри GitHub —
+  Actions, Copilot CLI и один токен в зашифрованных Secrets.
 - Каждый агент — **один YAML-файл**. Скопируй в свой репозиторий — и у тебя такой же улей.
 
 ## 📦 Забрать улей себе
@@ -62,12 +64,14 @@ git clone https://github.com/rtynbirf/polymat-hive.git
 cp -r polymat-hive/.github/workflows твой-репо/.github/workflows/
 ```
 
-Подробные карточки агентов — в [agents/CREW.md](agents/CREW.md).
+Понадобится секрет `COPILOT_PAT` (токен с доступом к Copilot) — карточки
+агентов и инструкция в [agents/CREW.md](agents/CREW.md).
 
 ## 🗺 Дорожная карта экипажа
 
 - [x] 🧠 Триаж-агент
 - [x] 📰 Дайджест-агент
+- [x] 🩺 Доктор улея
 - [ ] 🌐 Агент-переводчик (RU ↔ EN в issue)
 - [ ] 🧹 Хранитель README (оценка качества по чек-листу)
 - [ ] 🌙 Ночной ревизор (битые ссылки, мусорные файлы)
