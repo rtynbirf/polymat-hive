@@ -1,0 +1,94 @@
+name: "🧠 Триаж-агент"
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+  models: read
+
+concurrency:
+  group: triage-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Опросить модель (GitHub Models)"
+        id: analyze
+        continue-on-error: true
+        uses: actions/ai-inference@v1
+        with:
+          model: openai/gpt-4.1-mini
+          temperature: "0.2"
+          max-tokens: "600"
+          system-prompt: |
+            Ты — Триаж-агент живого репозитория-организма «Полимат-Улей».
+            Верни СТРОГО один JSON-объект, без markdown-ограждений и пояснений:
+            {"labels": ["..."], "summary": "одно предложение по-русски", "plan": ["шаг 1", "шаг 2", "шаг 3"]}
+            Метки выбирай ТОЛЬКО из списка: bug, enhancement, question, documentation, "good first issue".
+            Будь конкретным и дружелюбным. Язык ответа: русский.
+          prompt: |
+            Заголовок выпуска: ${{ github.event.issue.title }}
+
+            Тело выпуска:
+            ${{ github.event.issue.body }}
+
+      - name: "Разобрать ответ"
+        id: parse
+        env:
+          REPLY: ${{ steps.analyze.outputs.response }}
+        run: |
+          printf '%s' "$REPLY" > reply.json
+          python3 - <<'PY'
+          import json, re, pathlib
+          raw = pathlib.Path("reply.json").read_text(encoding="utf-8")
+          raw = re.sub(r"```[a-zA-Z]*", "", raw).strip()
+          data = {}
+          m = re.search(r"\{[\s\S]*\}", raw)
+          if m:
+              try:
+                  data = json.loads(m.group(0))
+              except Exception:
+                  data = {}
+          labels = ",".join([str(x).lower().strip() for x in (data.get("labels") or [])][:3])
+          summary = str(data.get("summary") or "Экипаж принял выпуск в обработку.")
+          plan = "\n".join("%d. %s" % (i + 1, p) for i, p in enumerate((data.get("plan") or [])[:5]))
+          pathlib.Path("reply.json").write_text(json.dumps(
+              {"labels": labels, "summary": summary, "plan": plan}, ensure_ascii=False), encoding="utf-8")
+          PY
+
+      - name: "Поставить метки и ответить"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const allowed = ['bug','enhancement','question','documentation','good first issue','help wanted'];
+            let d = { labels: '', summary: 'Экипаж принял выпуск в обработку.', plan: '' };
+            try { d = Object.assign(d, JSON.parse(fs.readFileSync('reply.json', 'utf8'))); } catch (e) {}
+            const { owner, repo } = context.repo;
+            const n = context.issue.number;
+            let labels = String(d.labels || '').split(',').map(s => s.trim()).filter(l => allowed.includes(l));
+            if (labels.length === 0) labels = ['question'];
+            for (const l of labels) {
+              try {
+                await github.rest.issues.addLabels({ owner, repo, issue_number: n, labels: [l] });
+              } catch (e) {
+                try {
+                  await github.rest.issues.createLabel({ owner, repo, name: l, color: '0E8A16' });
+                  await github.rest.issues.addLabels({ owner, repo, issue_number: n, labels: [l] });
+                } catch (e2) {}
+              }
+            }
+            const plan = String(d.plan || '').trim() || '1. Дождаться уточнений от автора.';
+            const body = '🧠 **Триаж-агент** на связи.\n\n> ' + String(d.summary) +
+              '\n\n**План экипажа:**\n' + plan +
+              '\n\n_Метки выданы автоматически: ' + labels.join(', ') +
+              '. Агент работает на GitHub Models + Actions — без серверов и ключей._';
+            await github.rest.issues.createComment({ owner, repo, issue_number: n, body });
+            try {
+              await github.rest.issues.addLabels({ owner, repo, issue_number: n, labels: ['🤖 экипаж'] });
+            } catch (e) {}
