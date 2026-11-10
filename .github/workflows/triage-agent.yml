@@ -16,10 +16,7 @@ jobs:
   triage:
     runs-on: ubuntu-latest
     steps:
-      - name: "Установить Copilot CLI"
-        run: npm install -g @github/copilot
-
-      - name: "Опросить модель (Copilot CLI)"
+      - name: "Этаж 1 · Copilot CLI"
         id: analyze
         continue-on-error: true
         uses: actions/ai-inference@v3
@@ -27,8 +24,6 @@ jobs:
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_PAT }}
         with:
           model: gpt-4.1
-          temperature: "0.2"
-          max-tokens: "600"
           system-prompt: |
             Ты — Триаж-агент живого репозитория-организма «Полимат-Улей».
             Верни СТРОГО один JSON-объект, без markdown-ограждений и пояснений:
@@ -41,8 +36,63 @@ jobs:
             Тело выпуска:
             ${{ github.event.issue.body }}
 
-      - name: "Разобрать ответ"
+      - name: "Кэш локального мозга"
+        id: braincache
+        if: steps.analyze.outputs.response == ''
+        uses: actions/cache@v4
+        with:
+          path: ~/brain
+          key: brain-qwen05b-q4km-v1
+
+      - name: "Скачать локальный мозг (Qwen2.5-0.5B GGUF)"
+        if: steps.analyze.outputs.response == '' && steps.braincache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/brain
+          curl -L --fail -o ~/brain/brain.gguf https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf
+
+      - name: "Этаж 2 · Локальный нейромозг"
+        if: steps.analyze.outputs.response == ''
+        env:
+          TITLE: ${{ github.event.issue.title }}
+          BODY: ${{ github.event.issue.body }}
+        run: |
+          pip install -q llama-cpp-python
+          python3 - <<'PY'
+          import json, os, pathlib, re
+          title = os.environ.get("TITLE", "")
+          body = os.environ.get("BODY", "")[:800]
+          allowed = ["bug", "enhancement", "question", "documentation", "good first issue"]
+          labels, summary, plan = ["question"], "Экипаж принял выпуск в обработку.", ""
+          try:
+              from llama_cpp import Llama
+              llm = Llama(os.path.expanduser("~/brain/brain.gguf"), n_ctx=1024, verbose=False)
+              out = llm.create_chat_completion(
+                  messages=[
+                      {"role": "system", "content": "Ты триаж-агент репозитория. Отвечай ТОЛЬКО JSON вида {\"labels\":[\"...\"],\"summary\":\"...\",\"plan\":[\"...\",\"...\",\"...\"]}. Метки только из списка: bug, enhancement, question, documentation, good first issue. Кратко, по-русски, дружелюбно."},
+                      {"role": "user", "content": "Заголовок выпуска: " + title + "\n\nТело выпуска:\n" + body},
+                  ],
+                  max_tokens=220, temperature=0.2)
+              text = out["choices"][0]["message"]["content"]
+              m = re.search(r"\{[\s\S]*\}", text)
+              if m:
+                  d = json.loads(m.group(0))
+                  ls = [str(x).lower().strip() for x in (d.get("labels") or []) if str(x).lower().strip() in allowed]
+                  if ls:
+                      labels = ls[:2]
+                  if d.get("summary"):
+                      summary = str(d["summary"])[:200]
+                  plan = "\n".join("%d. %s" % (i + 1, str(p)) for i, p in enumerate((d.get("plan") or [])[:3]))
+          except Exception as e:
+              print("нейромозг молчит:", e)
+          if not plan:
+              plan = "1. Уточнить детали у автора.\n2. Проверить похожие выпуски.\n3. Взять в работу."
+          pathlib.Path("reply.json").write_text(json.dumps(
+              {"labels": ",".join(labels), "summary": summary, "plan": plan}, ensure_ascii=False), encoding="utf-8")
+          PY
+
+      - name: "Разобрать ответ этажа 1"
         id: parse
+        if: steps.analyze.outputs.response != ''
         env:
           REPLY: ${{ steps.analyze.outputs.response }}
         run: |
@@ -91,7 +141,7 @@ jobs:
             const body = '🧠 **Триаж-агент** на связи.\n\n> ' + String(d.summary) +
               '\n\n**План экипажа:**\n' + plan +
               '\n\n_Метки выданы автоматически: ' + labels.join(', ') +
-              '. Агент работает через Copilot CLI внутри GitHub Actions._';
+              '. Экипаж живёт в GitHub Actions: Copilot → локальный GGUF-мозг → инстинкты._';
             await github.rest.issues.createComment({ owner, repo, issue_number: n, body });
             try {
               await github.rest.issues.addLabels({ owner, repo, issue_number: n, labels: ['🤖 экипаж'] });
