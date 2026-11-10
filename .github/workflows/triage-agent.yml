@@ -19,7 +19,7 @@ jobs:
       - name: "Этаж 1 · Copilot CLI"
         id: analyze
         continue-on-error: true
-        uses: actions/ai-inference@v3
+        uses: actions/ai-inference@2c43c91ae16266ca159d311430343c67a5ffa222 # v3
         env:
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_PAT }}
         with:
@@ -39,7 +39,7 @@ jobs:
       - name: "Кэш локального мозга"
         id: braincache
         if: steps.analyze.outputs.response == ''
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: ~/brain
           key: brain-qwen05b-q4km-v1
@@ -143,7 +143,7 @@ jobs:
           PY
 
       - name: "Поставить метки и ответить"
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
           script: |
             const fs = require('fs');
