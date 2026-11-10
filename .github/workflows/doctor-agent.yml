@@ -16,16 +16,43 @@ jobs:
   doctor:
     runs-on: ubuntu-latest
     steps:
-      - name: "Криминалистика Copilot CLI"
+      - name: "Кэш локального мозга"
+        id: braincache
+        uses: actions/cache@v4
+        with:
+          path: ~/brain
+          key: brain-qwen05b-q4km-v1
+
+      - name: "Скачать локальный мозг"
+        if: steps.braincache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/brain
+          curl -L --fail -o ~/brain/brain.gguf https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf
+
+      - name: "Этаж 1 · проверка Copilot"
         env:
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_PAT }}
         run: |
+          if [ -z "$COPILOT_GITHUB_TOKEN" ]; then
+            echo "🩺 Этаж 1 (Copilot): секрет COPILOT_PAT не задан — этаж спит."
+            exit 0
+          fi
           npm install -g @github/copilot >/dev/null 2>&1
-          echo "== версия CLI =="
-          copilot --version 2>&1 | head -3
-          echo "== вариант 1: COPILOT_GITHUB_TOKEN =="
-          copilot -p "Скажи ровно: УЛЕЙ ЖИВ" -s --no-ask-user 2>&1 | head -15
-          echo "== вариант 2: GITHUB_TOKEN =="
-          GITHUB_TOKEN="$COPILOT_GITHUB_TOKEN" copilot -p "Скажи ровно: УЛЕЙ ЖИВ" -s --no-ask-user 2>&1 | head -15
-          echo "== вариант 3: GH_TOKEN =="
-          GH_TOKEN="$COPILOT_GITHUB_TOKEN" copilot -p "Скажи ровно: УЛЕЙ ЖИВ" -s --no-ask-user 2>&1 | head -15
+          if copilot -p "Скажи ровно: УЛЕЙ ЖИВ" -s --no-ask-user 2>&1 | rg -q "УЛЕЙ ЖИВ"; then
+            echo "🩺 Этаж 1 (Copilot): ЖИВ."
+          else
+            echo "🩺 Этаж 1 (Copilot): секрет есть, но аутентификация не прошла — проверь подписку Copilot."
+          fi
+
+      - name: "Этаж 2 · проверка локального GGUF"
+        run: |
+          pip install -q llama-cpp-python
+          python3 - <<'PY'
+          from llama_cpp import Llama
+          import os
+          llm = Llama(os.path.expanduser("~/brain/brain.gguf"), n_ctx=256, verbose=False)
+          out = llm.create_chat_completion(
+              messages=[{"role": "user", "content": "Скажи ровно: УЛЕЙ ЖИВ"}],
+              max_tokens=20)
+          print("🩺 Этаж 2 (локальный GGUF):", out["choices"][0]["message"]["content"].strip())
+          PY
