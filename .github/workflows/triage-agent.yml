@@ -71,17 +71,40 @@ jobs:
                       {"role": "system", "content": "Ты триаж-агент репозитория. Отвечай ТОЛЬКО JSON вида {\"labels\":[\"...\"],\"summary\":\"...\",\"plan\":[\"...\",\"...\",\"...\"]}. Метки только из списка: bug, enhancement, question, documentation, good first issue. Кратко, по-русски, дружелюбно."},
                       {"role": "user", "content": "Заголовок выпуска: " + title + "\n\nТело выпуска:\n" + body},
                   ],
-                  max_tokens=220, temperature=0.2)
+                  max_tokens=300, temperature=0.2)
               text = out["choices"][0]["message"]["content"]
+              print("🧠 сырой ответ мозга:", text[:400])
               m = re.search(r"\{[\s\S]*\}", text)
-              if m:
-                  d = json.loads(m.group(0))
+              frag = m.group(0) if m else (text[text.find("{"):] if "{" in text else None)
+              d = None
+              if frag:
+                  dec = json.JSONDecoder()
+                  for close in ["", "}", "\"}", "\"}]", "]}"]:
+                      try:
+                          obj, _ = dec.raw_decode(frag + close)
+                          if isinstance(obj, dict):
+                              d = obj
+                              break
+                      except Exception:
+                          continue
+              if d:
                   ls = [str(x).lower().strip() for x in (d.get("labels") or []) if str(x).lower().strip() in allowed]
                   if ls:
                       labels = ls[:2]
                   if d.get("summary"):
                       summary = str(d["summary"])[:200]
                   plan = "\n".join("%d. %s" % (i + 1, str(p)) for i, p in enumerate((d.get("plan") or [])[:3]))
+              else:
+                  low = (title + " " + body).lower()
+                  kw = [("bug", ["ошиб", "баг", "не работа", "падает", "краш"]),
+                        ("enhancement", ["хочу", "умел", "добав", "перевод", "поддержк", "улучш", "фича"]),
+                        ("question", ["?", "как ", "почему", "можно ли"]),
+                        ("documentation", ["документац", "readme", "инструкц"])]
+                  ls = [lab for lab, words in kw if any(w in low for w in words)]
+                  if ls:
+                      labels = ls[:2]
+                  summary = "Инстинкты распознали тему: " + title[:120]
+                  print("🧠 JSON не распознан — метки по инстинктам:", labels)
           except Exception as e:
               print("нейромозг молчит:", e)
           if not plan:
