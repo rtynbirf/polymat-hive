@@ -20,9 +20,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: "Установить Copilot CLI"
-        run: npm install -g @github/copilot
-
       - name: "Собрать хронику за 24 часа"
         id: chronicle
         env:
@@ -39,7 +36,7 @@ jobs:
             echo "EOISS"
           } >> "$GITHUB_OUTPUT"
 
-      - name: "Попросить модель написать дайджест"
+      - name: "Этаж 1 · Copilot CLI"
         id: analyze
         continue-on-error: true
         if: steps.chronicle.outputs.LOG != ''
@@ -48,8 +45,6 @@ jobs:
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_PAT }}
         with:
           model: gpt-4.1
-          temperature: "0.4"
-          max-tokens: "700"
           system-prompt: |
             Ты — Дайджест-агент живого репозитория «Полимат-Улей».
             Напиши короткий markdown-дайджест дня на русском: заголовок ##,
@@ -62,13 +57,33 @@ jobs:
             Открытые выпуски:
             ${{ steps.chronicle.outputs.ISSUES }}
 
-      - name: "Записать DIGEST.md"
-        if: steps.analyze.outputs.response != ''
+      - name: "Записать DIGEST.md (модель или инстинкты)"
         env:
           REPLY: ${{ steps.analyze.outputs.response }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          printf '%s\n' "$REPLY" > DIGEST.md
-          printf '\n---\n_Сгенерировано Дайджест-агентом · Copilot CLI · %s (UTC)_\n' "$(date -u '+%Y-%m-%d %H:%M')" >> DIGEST.md
+          if [ -n "$REPLY" ]; then
+            printf '%s\n' "$REPLY" > DIGEST.md
+            printf '\n---\n_Сгенерировано Дайджест-агентом · %s (UTC)_\n' "$(date -u '+%Y-%m-%d %H:%M')" >> DIGEST.md
+          else
+            n_commits=$(git log --since="24 hours ago" --oneline | wc -l)
+            n_issues=$(gh issue list --state open --json number -q 'length' 2>/dev/null || echo 0)
+            mood="спокойное наблюдение"
+            if [ "$n_commits" -ge 1 ] && [ "$n_commits" -le 5 ]; then mood="рабочий ритм"; fi
+            if [ "$n_commits" -gt 5 ]; then mood="кайф от темпа"; fi
+            cat > DIGEST.md <<EOD
+          ## 📰 Дайджест · $(date -u +%Y-%m-%d)
+
+          - Коммитов за сутки: $n_commits
+          - Открытых выпусков: $n_issues
+          - Мозг: верхние этажи спят — дайджест собран инстинктами.
+
+          Настроение экипажа: **$mood**.
+
+          ---
+          _Сгенерировано Дайджест-агентом · $(date -u '+%Y-%m-%d %H:%M') (UTC)_
+          EOD
+          fi
 
       - name: "Закоммитить дайджест"
         run: |
