@@ -93,7 +93,11 @@ jobs:
                       labels = ls[:2]
                   if d.get("summary"):
                       summary = str(d["summary"])[:200]
-                  plan = "\n".join("%d. %s" % (i + 1, str(p)) for i, p in enumerate((d.get("plan") or [])[:3]))
+                  raw_plan = d.get("plan")
+                  if isinstance(raw_plan, str):
+                      raw_plan = [raw_plan]
+                  plist = [str(p).strip() for p in (raw_plan or []) if str(p).strip().lower() not in ("none", "null", "")]
+                  plan = "\n".join("%d. %s" % (i + 1, p) for i, p in enumerate(plist[:3]))
               else:
                   low = (title + " " + body).lower()
                   kw = [("bug", ["ошиб", "баг", "не работа", "падает", "краш"]),
