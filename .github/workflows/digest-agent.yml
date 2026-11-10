@@ -1,0 +1,74 @@
+name: "📰 Дайджест-агент"
+
+on:
+  schedule:
+    - cron: "30 5 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  models: read
+
+concurrency:
+  group: digest
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Собрать хронику за 24 часа"
+        id: chronicle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "LOG<<EOLOG"
+            git log --since="24 hours ago" --pretty=format:"- %s · %an" || true
+            echo "EOLOG"
+            echo "ISSUES<<EOISS"
+            gh issue list --state open --limit 20 --json number,title -q '.[] | "- #\(.number) \(.title)"' || true
+            echo "EOISS"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: "Попросить модель написать дайджест"
+        id: analyze
+        continue-on-error: true
+        if: steps.chronicle.outputs.LOG != ''
+        uses: actions/ai-inference@v1
+        with:
+          model: openai/gpt-4.1-mini
+          temperature: "0.4"
+          max-tokens: "700"
+          system-prompt: |
+            Ты — Дайджест-агент живого репозитория «Полимат-Улей».
+            Напиши короткий markdown-дайджест дня на русском: заголовок ##,
+            3–5 пунктов о проделанном, финальная строка «Настроение экипажа: …».
+            Без преамбул и ограждений, только markdown.
+          prompt: |
+            Коммиты за сутки:
+            ${{ steps.chronicle.outputs.LOG }}
+
+            Открытые выпуски:
+            ${{ steps.chronicle.outputs.ISSUES }}
+
+      - name: "Записать DIGEST.md"
+        if: steps.analyze.outputs.response != ''
+        env:
+          REPLY: ${{ steps.analyze.outputs.response }}
+        run: |
+          printf '%s\n' "$REPLY" > DIGEST.md
+          printf '\n---\n_Сгенерировано Дайджест-агентом · GitHub Models · %s (UTC)_\n' "$(date -u '+%Y-%m-%d %H:%M')" >> DIGEST.md
+
+      - name: "Закоммитить дайджест"
+        run: |
+          git config user.name "digest-agent[bot]"
+          git config user.email "actions@github.com"
+          git add DIGEST.md
+          if git diff --cached --quiet; then echo "Событий не было — коммит пропущен"; exit 0; fi
+          git commit -m "📰 дайджест: $(date -u +%Y-%m-%d) [skip ci]"
+          git push
