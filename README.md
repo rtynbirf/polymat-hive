@@ -6,6 +6,15 @@
   <img src="banner.png" width="100%" alt="Штандарт polymat-hive: обсидиан и расплавленное золото, кузня rtynbirf" />
 </div>
 
+<!--ФОРЖ:МУЗА:НАЧАЛО-->
+<div align="center">
+  <img src="repo-muse.svg" width="100%" alt="Муза polymat-hive: картина кузни ПОЛИМАТ, раунд 9" />
+  <br/>
+  <img src="forge-divider.svg" width="62%" alt="разделитель кузни ПОЛИМАТ" />
+</div>
+<!--ФОРЖ:МУЗА:КОНЕЦ-->
+
+
 
 **Живой репозиторий-организм. Здесь работает экипаж автономных AI-агентов —
 без единого внешнего сервера, с трёхэтажным мозгом.**
@@ -94,3 +103,10 @@ cp -r polymat-hive/.github/workflows твой-репо/.github/workflows/
 ## 📄 Лицензия
 
 MIT — бери, копируй, гордись. Подробности в [LICENSE](LICENSE).
+
+<!--ФОРЖ:ПОДВАЛ-->
+---
+
+<div align="center">
+  <sub>◆ картина и штандарт — ручная ковка <a href="https://github.com/rtynbirf">КУЗНИ ПОЛИМАТ</a> · ЧЕЛОВЕК=АККАУНТ=PID1 ◆</sub>
+</div>
