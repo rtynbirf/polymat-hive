@@ -8,7 +8,7 @@
 
 <!--ФОРЖ:МУЗА:НАЧАЛО-->
 <div align="center">
-  <img src="repo-muse.svg" width="100%" alt="Муза polymat-hive: мастерская УЛЕЙ, кузня ПОЛИМАТ, раунд 11" />
+  <img src="repo-muse.svg" width="100%" alt="Муза polymat-hive: мастерская УЛЕЙ, кузня ПОЛИМАТ, раунд 12 · REVE=РЕВО" />
   <br/>
   <img src="forge-divider.svg" width="62%" alt="делитель мастерской УЛЕЙ" />
 </div>
