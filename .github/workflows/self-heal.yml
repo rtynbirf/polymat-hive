@@ -28,6 +28,10 @@ on:
       - "📰 Дайджест-агент"
       - "🧠 Триаж-агент"
       - "🩺 Доктор улея"
+      - "РЕВО ОБХОД"
+      - "Scorecard analysis"
+      - "Workflow security lint (zizmor)"
+      - "CodeQL"
     types: [completed]
 permissions:
   actions: write
