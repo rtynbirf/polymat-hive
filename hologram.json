@@ -2,7 +2,7 @@
  "hologram": 1,
  "root": "c223bd4a2f6a56783c1fbdb1b1f671fa61c3150ecf320c82796ea5763043a696",
  "n": 73,
- "storage": 68,
+ "storage": 36,
  "r": 3,
  "self": {
   "name": "polymat-hive",
@@ -324,10 +324,28 @@
    "cluster": ""
   },
   {
+   "name": "os-forge",
+   "desc": "OS-FORGE v0.1.1 — самодостаточный автономный батник: карта среды (железо+ОС по фактам) → решение → сеть (репозиторий пунктов) → сборка актуальной ОС → готовый ISO с манифестом. Windows (cmd+PowerShell",
+   "lang": "Python",
+   "cluster": "OS"
+  },
+  {
    "name": "release-vault",
    "desc": "release-vault — Шифрованное хранилище релизных ассетов",
    "lang": "Python",
    "cluster": "VAULT"
+  },
+  {
+   "name": "revo",
+   "desc": "REVO — автономный прототип метода Reve: layout → render",
+   "lang": "Python",
+   "cluster": "HUB"
+  },
+  {
+   "name": "ruvson-lyrics",
+   "desc": "RUVSON — тексты 65 треков: черновики, пайплайн, финальный ZIP",
+   "lang": "JavaScript",
+   "cluster": ""
   }
  ]
 }
