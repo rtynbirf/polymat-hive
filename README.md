@@ -3,14 +3,14 @@
 # 🐝 ПОЛИМАТ-УЛЕЙ
 
 <div align="center">
-  <img src="banner.png" width="100%" alt="Штандарт polymat-hive: обсидиан и расплавленное золото, кузня rtynbirf" />
+  <img src="https://cdn.jsdelivr.net/gh/rtynbirf/polymat-hive@main/banner.png" width="100%" alt="Штандарт polymat-hive: обсидиан и расплавленное золото, кузня rtynbirf" />
 </div>
 
 <!--ФОРЖ:МУЗА:НАЧАЛО-->
 <div align="center">
-  <img src="repo-muse.svg" width="100%" alt="Муза polymat-hive: мастерская УЛЕЙ, кузня ПОЛИМАТ, раунд 12 · REVE=РЕВО" />
+  <img src="https://cdn.jsdelivr.net/gh/rtynbirf/polymat-hive@main/repo-muse.svg" width="100%" alt="Муза polymat-hive: мастерская УЛЕЙ, кузня ПОЛИМАТ, раунд 12 · REVE=РЕВО" />
   <br/>
-  <img src="forge-divider.svg" width="62%" alt="делитель мастерской УЛЕЙ" />
+  <img src="https://cdn.jsdelivr.net/gh/rtynbirf/polymat-hive@main/forge-divider.svg" width="62%" alt="делитель мастерской УЛЕЙ" />
 </div>
 <!--ФОРЖ:МУЗА:КОНЕЦ-->
 
