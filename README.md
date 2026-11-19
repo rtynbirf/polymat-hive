@@ -1,5 +1,11 @@
 <div align="center">
 
+<a href="https://github.com/rtynbirf/polymat-hive"><img src="banner.png" width="100%" alt="polymat-hive — штандарт мастерской в каноне ORNAMENTAL MYTHO-REALISM"></a>
+
+</div>
+
+<div align="center">
+
 # 🐝 ПОЛИМАТ-УЛЕЙ
 
 <div align="center">
@@ -21,7 +27,7 @@
 
 | ФАЙЛОВ | ПАПОК | КОММИТОВ | ОБНОВЛЕНО | РЕЛИЗОВ |
 |---:|---:|---:|---|---:|
-| 39 | 5 | 144 | 2026-11-19 | 0 |
+| 39 | 5 | 145 | 2026-11-19 | 0 |
 <!--ФОРЖ:ПАСПОРТ:КОНЕЦ-->
 
 
