@@ -1,8 +1,8 @@
 {
  "hologram": 1,
- "root": "f9cae3a874a9064bc1ccba9db8e0255366799943b735f2a8be5b259b79316d23",
+ "root": "4bcb8a068871f9158f688c6941bf4b381477a19c0c45283c73811c92000edb94",
  "n": 79,
- "storage": 44,
+ "storage": 74,
  "r": 3,
  "self": {
   "name": "polymat-hive",
@@ -109,7 +109,7 @@
   },
   {
    "name": "global-practice-atlas",
-   "hash": "a67f05603d13bf1c7da83d003c8bc9e48ea60dd0e166e1fd2eea58b60f9dd304"
+   "hash": "420b94983834f6bc6de962c180368b34a79340d2a0e638eeeddc040fd7717feb"
   },
   {
    "name": "global-video-platforms-registry",
@@ -348,22 +348,10 @@
    "cluster": ""
   },
   {
-   "name": "os-forge",
-   "desc": "OS-FORGE v0.1.1 — самодостаточный автономный батник: карта среды (железо+ОС по фактам) → решение → сеть (репозиторий пунктов) → сборка актуальной ОС → готовый ISO с манифестом. Windows (cmd+PowerShell",
-   "lang": "Python",
-   "cluster": "OS"
-  },
-  {
    "name": "release-vault",
    "desc": "release-vault — Шифрованное хранилище релизных ассетов",
    "lang": "Python",
    "cluster": "VAULT"
-  },
-  {
-   "name": "ruvson-lyrics",
-   "desc": "RUVSON — тексты 65 треков: черновики, пайплайн, финальный ZIP",
-   "lang": "JavaScript",
-   "cluster": ""
   }
  ]
 }
