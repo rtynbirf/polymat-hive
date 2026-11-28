@@ -4,14 +4,6 @@
 
 </div>
 
-<div align="center">
-
-# 🐝 ПОЛИМАТ-УЛЕЙ
-
-<div align="center">
-  <img src="https://cdn.jsdelivr.net/gh/rtynbirf/polymat-hive@main/banner.png" width="100%" alt="Штандарт polymat-hive: обсидиан и расплавленное золото, кузня rtynbirf" />
-</div>
-
 <!--ФОРЖ:МУЗА:НАЧАЛО-->
 <div align="center">
   <img src="https://cdn.jsdelivr.net/gh/rtynbirf/polymat-hive@main/repo-muse.svg" width="100%" alt="Муза polymat-hive: мастерская УЛЕЙ, кузня ПОЛИМАТ, раунд 12 · REVE=РЕВО" />
@@ -22,13 +14,35 @@
 
 <!--ФОРЖ:ПАСПОРТ:НАЧАЛО-->
 <div align="center">
-  <img src="revo-page.svg" width="100%" alt="РЕВО-паспорт страницы polymat-hive в каноне ORNAMENTAL MYTHO-REALISM: орнаментальная решётка, медальон-миф, строение файлов, лексикон — по фактическому контенту" />
+  <img src="revo-page.svg" width="100%" alt="РЕВО-паспорт страницы polymat-hive №40 в каноне ORNAMENTAL MYTHO-REALISM: орнаментальная решётка, медальон-миф, строение файлов, лексикон — по фактическому контенту" />
 </div>
 
 | ФАЙЛОВ | ПАПОК | КОММИТОВ | ОБНОВЛЕНО | РЕЛИЗОВ |
 |---:|---:|---:|---|---:|
-| 48 | 6 | 213 | 2026-11-28 | 0 |
+| 48 | 6 | 1 | 2026-11-28 | 1 |
 <!--ФОРЖ:ПАСПОРТ:КОНЕЦ-->
+
+# polymat-hive
+
+<p align="center"><img src="https://cdn.jsdelivr.net/gh/rtynbirf/polymat-hive@main/.github/social-preview.png" alt="polymat-hive" width="100%"></p>
+
+<div align="center">
+
+<a href="https://github.com/rtynbirf/polymat-hive"><img src="banner.png" width="100%" alt="polymat-hive — штандарт мастерской в каноне ORNAMENTAL MYTHO-REALISM"></a>
+
+</div>
+
+<div align="center">
+
+# 🐝 ПОЛИМАТ-УЛЕЙ
+
+<div align="center">
+  <img src="https://cdn.jsdelivr.net/gh/rtynbirf/polymat-hive@main/banner.png" width="100%" alt="Штандарт polymat-hive: обсидиан и расплавленное золото, кузня rtynbirf" />
+</div>
+
+
+
+
 
 
 
